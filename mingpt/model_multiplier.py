@@ -149,7 +149,7 @@ class GPT(nn.Module):
             ln_f = nn.LayerNorm(config.n_embd),
         ))
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
-
+        self.initialization = config.initialization
         # init all weights, and apply a special scaled init to the residual projections, per GPT-2 paper
         self.apply(self._init_weights)
         for pn, p in self.named_parameters():
@@ -163,11 +163,21 @@ class GPT(nn.Module):
     def _init_weights(self, module):
         # TODO:  you may choose different initialization
         if isinstance(module, nn.Linear):
-            torch.nn.init.xavier_uniform_(module.weight, gain=1.0)
+            if self.initialization == "normal":
+                torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            elif self.initialization == "xavier":
+                torch.nn.init.xavier_uniform_(module.weight, gain=1.0)
+            else:
+                raise ValueError(f"unknown initialization: {self.initialization}")
             if module.bias is not None:
                 torch.nn.init.zeros_(module.bias)
         elif isinstance(module, nn.Embedding):
-            torch.nn.init.torch.nn.init.xavier_uniform_(module.weight, gain=1.0)
+            if self.initialization == "normal":
+                torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            elif self.initialization == "xavier":
+                torch.nn.init.torch.nn.init.xavier_uniform_(module.weight, gain=1.0)
+            else:
+                raise ValueError(f"unknown initialization: {self.initialization}")
         elif isinstance(module, nn.LayerNorm):
             torch.nn.init.zeros_(module.bias)
             torch.nn.init.ones_(module.weight)

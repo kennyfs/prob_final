@@ -34,6 +34,7 @@ def get_config(seed):
     # model
     C.model = GPT.get_default_config()
     C.model.model_type = 'gpt-mini'
+    C.model.initialization = "xavier" # or "normal"
     
     # trainer
     C.trainer = Trainer.get_default_config()
@@ -89,14 +90,18 @@ def run(seed):
     return stop_iteration
 
 if __name__ == '__main__':
+    skip_initial = 0
     initial_seed = 114514
     random.seed(initial_seed)
     # open a file and clear it
-    with open('result-ChickenRabbit-xavier.txt', 'w') as f:
-        f.write('seed, stop_iteration\n')
+    if skip_initial == 0:
+        with open('result-ChickenRabbit-xavier.txt', 'w') as f:
+            f.write('seed, stop_iteration\n')
     for i in range(100):
         seed = random.randrange(2**64)
         random.seed(seed)
+        if i < skip_initial:
+            continue
         result = run(seed)
         with open('result-ChickenRabbit-xavier.txt', 'a') as f:
             f.write(f'{seed}, {result}\n')
