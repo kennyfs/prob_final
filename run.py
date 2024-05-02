@@ -19,13 +19,13 @@ from itertools import permutations
 
 # -----------------------------------------------------------------------------
 
-def get_config():
+def get_config(seed):
     C = CN()
 
     # system
     C.system = CN()
     # TODO: random seed for model can be set here
-    C.system.init_seed = 62 # will change the weight initialization
+    C.system.init_seed = seed # will change the weight initialization
     C.system.work_dir = './test'
 
     # data
@@ -64,9 +64,8 @@ def batch_end_callback(trainer, model, train_dataset, test_dataset):
 
 # -----------------------------------------------------------------------------
 
-if __name__ == '__main__':
-
-    config = get_config()
+def run(seed):
+    config = get_config(seed)
     setup_logging(config)
 
     # TODO: try different seed for model
@@ -87,6 +86,17 @@ if __name__ == '__main__':
         print(f'The final iteration of this round is {stop_iteration}!')
     else:
         print('It cannot reach 0.9 acc within max_iteration steps...')
+    return stop_iteration
 
-
-    
+if __name__ == '__main__':
+    initial_seed = 114514
+    random.seed(initial_seed)
+    # open a file and clear it
+    with open('result-ChickenRabbit-xavier.txt', 'w') as f:
+        f.write('seed, stop_iteration\n')
+    for i in range(100):
+        seed = random.randrange(2**64)
+        random.seed(seed)
+        result = run(seed)
+        with open('result-ChickenRabbit-xavier.txt', 'a') as f:
+            f.write(f'{seed}, {result}\n')
