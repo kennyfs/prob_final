@@ -71,7 +71,7 @@ def batch_end_callback(trainer, model, train_dataset, test_dataset):
 
 # -----------------------------------------------------------------------------
 
-def run(seed, task, initialization):
+def run(seed, dataseed, task, initialization):
     config = get_config(seed, task, initialization)
     setup_logging(config)
 
@@ -80,11 +80,11 @@ def run(seed, task, initialization):
 
     # TODO: try different seed to adjust the data order of train/test-set
     if task == "gcd":
-        train_dataset = GCDDataset(config.data, split='train', seed=0)
-        test_dataset  = GCDDataset(config.data, split='test', seed=0)
+        train_dataset = GCDDataset(config.data, split='train', seed=dataseed)
+        test_dataset  = GCDDataset(config.data, split='test', seed=dataseed)
     elif task == "ChickenRabbit":
-        train_dataset = ChickenRabbitDataset(config.data, split='train', seed=0)
-        test_dataset  = ChickenRabbitDataset(config.data, split='test', seed=0)
+        train_dataset = ChickenRabbitDataset(config.data, split='train', seed=dataseed)
+        test_dataset  = ChickenRabbitDataset(config.data, split='test', seed=dataseed)
 
     # set the correct vocab size: 10, block size: chickenrabbit -> 10, gcd -> 6
     config.model.vocab_size = train_dataset.get_vocab_size()
@@ -103,6 +103,6 @@ if __name__ == '__main__':
     seed=random.randrange(2**64)
     task = sys.argv[1]
     initialization = sys.argv[2]
-    stop_iteration = run(seed, task, initialization)
-    with open(f"result-{task}-{initialization}.txt", "a") as f:
+    stop_iteration = run(62, seed, task, initialization)
+    with open(f"result-dataset-{task}-{initialization}.txt", "a") as f:
         f.write(f"{seed}, {stop_iteration}\n")
