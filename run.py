@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import threading
 import numpy as np
 import random
 import nltk
@@ -34,7 +35,7 @@ def get_config(seed):
     # model
     C.model = GPT.get_default_config()
     C.model.model_type = 'gpt-mini'
-    C.model.initialization = "xavier" # or "normal"
+    C.model.initialization = "normal" # or "normal"
     
     # trainer
     C.trainer = Trainer.get_default_config()
@@ -88,20 +89,34 @@ def run(seed):
     else:
         print('It cannot reach 0.9 acc within max_iteration steps...')
     return stop_iteration
-
+def run_seeds(seeds, start, end, results):
+    for i in range(start, end):
+        results[i]=run(seeds[i])
 if __name__ == '__main__':
-    skip_initial = 0
-    initial_seed = 114514
+    skip_initial = 69
+    initial_seed = 1919810
     random.seed(initial_seed)
     # open a file and clear it
     if skip_initial == 0:
-        with open('result-ChickenRabbit-xavier.txt', 'w') as f:
+        with open('result-ChickenRabbit-normal.txt', 'w') as f:
             f.write('seed, stop_iteration\n')
+    seeds = []
     for i in range(100):
         seed = random.randrange(2**64)
         random.seed(seed)
-        if i < skip_initial:
-            continue
-        result = run(seed)
-        with open('result-ChickenRabbit-xavier.txt', 'a') as f:
+        seeds.append(seed)
+    total=100
+    todo = total-skip_initial
+    results = [None]*total
+    threads=[]
+    for i in range(5):
+        t=threading.thread(target=run_seeds, args=(seeds, skip_initial+todo//5*i, skip_initial+todo//5*(i+1), results))
+        t.start()
+        threads.append(t)
+    for t in threads:
+        t.join()
+    with open('result-ChickenRabbit-normal.txt', 'a') as f:
+        for seed, result in zip(seeds, results):
+            if result is None:
+                continue
             f.write(f'{seed}, {result}\n')
