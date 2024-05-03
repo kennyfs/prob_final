@@ -6,7 +6,7 @@ import time
 import requests
 
 def run_command(args):
-    gcd, normal = args  # 解包元組
+    gcd, normal, seed= args  # 解包元組
     subprocess.run(["python3", "run.py", gcd, normal, str(seed)])
 
 if __name__ == "__main__":
