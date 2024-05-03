@@ -98,6 +98,7 @@ def run_seeds(seeds, start, end, results):
     for i in range(start, end):
         results[i]=run(seeds[i])
 if __name__ == '__main__':
+    print(f"get seed {sys.argv[3]}")
     random.seed(sys.argv[3])
     seed=random.randrange(2**64)
     task = sys.argv[1]

@@ -1,13 +1,14 @@
 from multiprocessing import Pool
 import random
 import subprocess
+import sys
 import time
 
 import requests
 
 def run_command(args):
-    gcd, normal, seed= args  # 解包元組
-    subprocess.run(["python3", "run.py", gcd, normal, str(seed)])
+    task, initialization, seed= args  # 解包元組
+    subprocess.run(["python3", "run.py", task, initialization, str(seed)])
 
 if __name__ == "__main__":
     r=requests.get("https://www.random.org/cgi-bin/randbyte?nbytes=8&format=d")
@@ -25,12 +26,12 @@ if __name__ == "__main__":
         print(f"time as seed: {seed}")
     random.seed(seed)
     st = time.time()
-    gcd = "ChickenRabbit"
-    normal = "normal"
+    task = sys.argv[1]
+    initialization = sys.argv[2]
     seeds=[]
-    for _ in range(31):
+    for _ in range(sys.argv[3]):
         seeds.append(random.randrange(2**64))
-    args_list = [(gcd, normal, seed) for seed in seeds]  # 創建一個包含31個相同元組的列表
+    args_list = [(task, initialization, seed) for seed in seeds]  # 創建一個包含31個相同元組的列表
     with Pool(5) as pool:
         pool.map(run_command, args_list)
     print(f"total time: {time.time()-st:.2f}s")
