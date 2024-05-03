@@ -18,7 +18,7 @@ from mingpt.model_multiplier import GPT
 from mingpt.trainer_multiplier import Trainer
 from mingpt.utils import set_seed, setup_logging, CfgNode as CN
 from itertools import permutations
-
+import requests
 # -----------------------------------------------------------------------------
 
 def get_config(seed, task, initialization):
@@ -99,8 +99,19 @@ def run_seeds(seeds, start, end, results):
     for i in range(start, end):
         results[i]=run(seeds[i])
 if __name__ == '__main__':
-    random.seed(time.time())
-    seed = random.randrange(2**64)
+    r=requests.get("https://www.random.org/cgi-bin/randbyte?nbytes=8&format=d")
+    q=5
+    while r.status_code!=200 and q>0:
+        r=requests.get("https://www.random.org/cgi-bin/randbyte?nbytes=8&format=d")
+        q-=1
+    if r.status_code==200:
+        seed=0
+        for i in r.text.split():
+            seed=seed*256+int(i)
+    else:
+        seed=time.time()
+    random.seed(seed)
+    seed=random.randrange(2**64)
     task = sys.argv[1]
     initialization = sys.argv[2]
     stop_iteration = run(seed, task, initialization)
