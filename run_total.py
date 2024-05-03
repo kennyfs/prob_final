@@ -29,9 +29,9 @@ if __name__ == "__main__":
     task = sys.argv[1]
     initialization = sys.argv[2]
     seeds=[]
-    for _ in range(sys.argv[3]):
+    for _ in range(int(sys.argv[3])):
         seeds.append(random.randrange(2**64))
     args_list = [(task, initialization, seed) for seed in seeds]  # 創建一個包含31個相同元組的列表
-    with Pool(5) as pool:
+    with Pool(4) as pool:
         pool.map(run_command, args_list)
     print(f"total time: {time.time()-st:.2f}s")
