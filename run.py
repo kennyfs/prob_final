@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import threading
+import time
 import numpy as np
 import random
 import nltk
@@ -9,7 +10,7 @@ np.set_printoptions(threshold=np.inf)
 
 import torch
 from ChickenRabbit import ChickenRabbitDataset, eval_split
-# from GCD import GCDDataset, eval_split
+from GCD import GCDDataset
 from torch.utils.data.dataloader import DataLoader
 torch.set_printoptions(profile="full")
 
@@ -20,7 +21,7 @@ from itertools import permutations
 
 # -----------------------------------------------------------------------------
 
-def get_config(seed):
+def get_config(seed, task, initialization):
     C = CN()
 
     # system
@@ -30,16 +31,21 @@ def get_config(seed):
     C.system.work_dir = './test'
 
     # data
-    C.data = ChickenRabbitDataset.get_default_config()
+    if task == "gcd":
+        C.data = GCDDataset.get_default_config()
+    elif task == "ChickenRabbit":
+        C.data = ChickenRabbitDataset.get_default_config()
+    else:
+        raise ValueError(f"task {task} is not supported")
 
     # model
     C.model = GPT.get_default_config()
     C.model.model_type = 'gpt-mini'
-    C.model.initialization = "normal" # or "normal"
+    C.model.initialization = initialization # "xavier" or "normal"
     
     # trainer
     C.trainer = Trainer.get_default_config()
-    C.trainer.task = "ChickenRabbit" # or gcd
+    C.trainer.task = task # ChickenRabbit or gcd
     return C
 
 def batch_end_callback(trainer, model, train_dataset, test_dataset):
@@ -66,16 +72,20 @@ def batch_end_callback(trainer, model, train_dataset, test_dataset):
 
 # -----------------------------------------------------------------------------
 
-def run(seed):
-    config = get_config(seed)
+def run(seed, task, initialization):
+    config = get_config(seed, task, initialization)
     setup_logging(config)
 
     # TODO: try different seed for model
     set_seed(config.system.init_seed)
 
     # TODO: try different seed to adjust the data order of train/test-set
-    train_dataset = ChickenRabbitDataset(config.data, split='train', seed=0)
-    test_dataset  = ChickenRabbitDataset(config.data, split='test', seed=0)
+    if task == "gcd":
+        train_dataset = GCDDataset(config.data, split='train', seed=0)
+        test_dataset  = GCDDataset(config.data, split='test', seed=0)
+    elif task == "ChickenRabbit":
+        train_dataset = ChickenRabbitDataset(config.data, split='train', seed=0)
+        test_dataset  = ChickenRabbitDataset(config.data, split='test', seed=0)
 
     # set the correct vocab size: 10, block size: chickenrabbit -> 10, gcd -> 6
     config.model.vocab_size = train_dataset.get_vocab_size()
@@ -84,39 +94,15 @@ def run(seed):
     trainer = Trainer(config.trainer, model, train_dataset, test_dataset)
     trainer.set_callback('on_batch_end', batch_end_callback)
     stop_iteration = trainer.run()
-    if stop_iteration != -1:
-        print(f'The final iteration of this round is {stop_iteration}!')
-    else:
-        print('It cannot reach 0.9 acc within max_iteration steps...')
     return stop_iteration
 def run_seeds(seeds, start, end, results):
     for i in range(start, end):
         results[i]=run(seeds[i])
 if __name__ == '__main__':
-    skip_initial = 69
-    initial_seed = 1919810
-    random.seed(initial_seed)
-    # open a file and clear it
-    if skip_initial == 0:
-        with open('result-ChickenRabbit-normal.txt', 'w') as f:
-            f.write('seed, stop_iteration\n')
-    seeds = []
-    for i in range(100):
-        seed = random.randrange(2**64)
-        random.seed(seed)
-        seeds.append(seed)
-    total=100
-    todo = total-skip_initial
-    results = [None]*total
-    threads=[]
-    for i in range(5):
-        t=threading.thread(target=run_seeds, args=(seeds, skip_initial+todo//5*i, skip_initial+todo//5*(i+1), results))
-        t.start()
-        threads.append(t)
-    for t in threads:
-        t.join()
-    with open('result-ChickenRabbit-normal.txt', 'a') as f:
-        for seed, result in zip(seeds, results):
-            if result is None:
-                continue
-            f.write(f'{seed}, {result}\n')
+    random.seed(time.time())
+    seed = random.randrange(2**64)
+    task = sys.argv[1]
+    initialization = sys.argv[2]
+    stop_iteration = run(seed, task, initialization)
+    with open(f"result-{task}-{initialization}.txt", "a") as f:
+        f.write(f"{seed}, {stop_iteration}\n")
