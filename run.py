@@ -105,4 +105,4 @@ if __name__ == '__main__':
     initialization = sys.argv[2]
     stop_iteration = run(62, seed, task, initialization)
     with open(f"result-dataset-{task}-{initialization}.txt", "a") as f:
-        f.write(f"{seed}, {stop_iteration}\n")
+        f.write(f"{seed}, {sys.argv[3]}, {stop_iteration}\n")
