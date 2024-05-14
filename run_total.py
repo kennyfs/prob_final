@@ -46,7 +46,7 @@ if __name__ == "__main__":
     if dataset == "random" or dataset == "r":
         dataset_seed = getrandom(len)
     else:
-        dataset_seed = [int(dataset_seed) for _ in range(len)]
+        dataset_seed = [int(dataset) for _ in range(len)]
     args_list = [
         (task, init, dataseed)
         for init, dataseed in zip(initialization_seed, dataset_seed)
