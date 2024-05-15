@@ -9,7 +9,7 @@ import requests
 
 def run_command(args):
     task, initialization, seed = args  # 解包元組
-    subprocess.run(["python3", "run.py", task, initialization, str(seed)])
+    subprocess.run(["python3", "run.py", str(task), str(initialization), str(seed)])
 
 
 def getrandom(len):
