@@ -98,11 +98,14 @@ def run_seeds(seeds, start, end, results):
     for i in range(start, end):
         results[i]=run(seeds[i])
 if __name__ == '__main__':
-    print(f"get seed {sys.argv[3]}")
-    random.seed(sys.argv[3])
-    seed=random.randrange(2**64)
     task = sys.argv[1]
     initialization = sys.argv[2]
-    stop_iteration = run(62, seed, task, initialization)
+    seed=int(sys.argv[3])
+    print(f"get seed {seed}")
+    dataset_seed = int(sys.argv[4])
+    print(f"get dataset seed {dataset_seed}")
+    random.seed(dataset_seed)
+
+    stop_iteration = run(seed, dataset_seed, task, initialization)
     with open(f"result-dataset-{task}-{initialization}.txt", "a") as f:
         f.write(f"{seed}, {sys.argv[3]}, {stop_iteration}\n")

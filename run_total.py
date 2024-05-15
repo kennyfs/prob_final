@@ -8,8 +8,8 @@ import requests
 
 
 def run_command(args):
-    task, initialization, seed = args  # 解包元組
-    subprocess.run(["python3", "run.py", str(task), str(initialization), str(seed)])
+    task, initialization, seed, dataset_seed = args  # 解包元組
+    subprocess.run(["python3", "run.py", str(task), str(initialization), str(seed), str(dataset_seed)])
 
 
 def getrandom(len):
@@ -38,20 +38,21 @@ if __name__ == "__main__":
     task = sys.argv[1]
     len = int(sys.argv[2])
     initialization = sys.argv[3]
+    initialization_seed = sys.argv[4]
     if initialization == "random" or initialization == "r":
-        initialization_seed = getrandom(len)
+        seeds = getrandom(len)
     else:
-        initialization_seed = [int(initialization) for _ in range(len)]
-    dataset = sys.argv[4]
+        seeds = [int(initialization) for _ in range(len)]
+    dataset = sys.argv[5]
     if dataset == "random" or dataset == "r":
         dataset_seed = getrandom(len)
     else:
         dataset_seed = [int(dataset) for _ in range(len)]
     args_list = [
-        (task, init, dataseed)
-        for init, dataseed in zip(initialization_seed, dataset_seed)
+        (task, initialization, seed, dataseed)
+        for seed, dataseed in zip(seeds, dataset_seed)
     ]  # 創建一個包含31個相同元組的列表
-    pools = int(sys.argv[5])
+    pools = int(sys.argv[6])
     if pools == 1:
         for args in args_list:
             run_command(args)
