@@ -39,18 +39,18 @@ if __name__ == "__main__":
     len = int(sys.argv[2])
     initialization = sys.argv[3]
     initialization_seed = sys.argv[4]
-    if initialization == "random" or initialization == "r":
+    if initialization_seed == "random" or initialization_seed == "r":
         seeds = getrandom(len)
     else:
-        seeds = [int(initialization) for _ in range(len)]
-    dataset = sys.argv[5]
-    if dataset == "random" or dataset == "r":
-        dataset_seed = getrandom(len)
+        seeds = [int(initialization_seed) for _ in range(len)]
+    dataset_seed = sys.argv[5]
+    if dataset_seed == "random" or dataset_seed == "r":
+        dataset_seeds = getrandom(len)
     else:
-        dataset_seed = [int(dataset) for _ in range(len)]
+        dataset_seeds = [int(dataset_seed) for _ in range(len)]
     args_list = [
         (task, initialization, seed, dataseed)
-        for seed, dataseed in zip(seeds, dataset_seed)
+        for seed, dataseed in zip(seeds, dataset_seeds)
     ]  # 創建一個包含31個相同元組的列表
     pools = int(sys.argv[6])
     if pools == 1:
