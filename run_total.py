@@ -51,8 +51,8 @@ if __name__ == "__main__":
         (task, init, dataseed)
         for init, dataseed in zip(initialization_seed, dataset_seed)
     ]  # 創建一個包含31個相同元組的列表
-    pools = sys.argv[5]
-    if pools == "1":
+    pools = int(sys.argv[5])
+    if pools == 1:
         for args in args_list:
             run_command(args)
     else:
