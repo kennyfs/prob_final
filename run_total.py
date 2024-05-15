@@ -51,6 +51,11 @@ if __name__ == "__main__":
         (task, init, dataseed)
         for init, dataseed in zip(initialization_seed, dataset_seed)
     ]  # 創建一個包含31個相同元組的列表
-    with Pool(1) as pool:
-        pool.map(run_command, args_list)
+    pools = sys.argv[5]
+    if pools == "1":
+        for args in args_list:
+            run_command(args)
+    else:
+        with Pool(pools) as pool:
+            pool.map(run_command, args_list)
     print(f"total time: {time.time()-st:.2f}s")
