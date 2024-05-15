@@ -107,5 +107,5 @@ if __name__ == '__main__':
     random.seed(dataset_seed)
 
     stop_iteration = run(seed, dataset_seed, task, initialization)
-    with open(f"result-dataset-{task}-{initialization}.txt", "a") as f:
-        f.write(f"{seed}, {sys.argv[3]}, {stop_iteration}\n")
+    with open(f"result-datasetseed-{task}-{dataset_seed}.txt", "a") as f:
+        f.write(f"{seed}, {stop_iteration}\n")
