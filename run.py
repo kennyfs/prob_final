@@ -19,7 +19,10 @@ from mingpt.trainer_multiplier import Trainer
 from mingpt.utils import set_seed, setup_logging, CfgNode as CN
 from itertools import permutations
 # -----------------------------------------------------------------------------
-
+def average_multi(seed, training_data):
+    # training data:
+    # Sort the training data
+    pass
 def get_config(seed, task, initialization):
     C = CN()
 
@@ -98,6 +101,11 @@ def run_seeds(seeds, start, end, results):
     for i in range(start, end):
         results[i]=run(seeds[i])
 if __name__ == '__main__':
+
+    config = get_config(0, "ChickenRabbit", "xavier")
+    train_dataset = GCDDataset(config.data, split='train', seed=0)
+    print(train_dataset)
+    exit(0)
     task = sys.argv[1]
     initialization = sys.argv[2]
     seed=int(sys.argv[3])
@@ -107,5 +115,5 @@ if __name__ == '__main__':
     random.seed(dataset_seed)
 
     stop_iteration = run(seed, dataset_seed, task, initialization)
-    with open(f"result-datasetseed-{task}-{dataset_seed}.txt", "a") as f:
+    with open(f"result-datasetseed-{task}-{dataset_seed}.csv", "a") as f:
         f.write(f"{seed}, {stop_iteration}\n")
