@@ -112,3 +112,4 @@ if __name__ == '__main__':
     stop_iteration = run(seed, dataset_seed, task, initialization)
     with open(f"result-{task}-true-random-v2.csv", "a") as f:
         f.write(f"{seed}, {stop_iteration}\n")
+#test if my github commit is verified
