@@ -63,16 +63,12 @@ class GCDDataset(Dataset):
 
         test_data, train_data = [], []
         
-        random.Random(seed).shuffle(data)
         for l in prime_data:
-            random.Random(seed).shuffle(l)
-            part = len(l) // 5
-            test_data += l[:part]
-            train_data += l[part:]
-
-        num_test = min(int(len(data)*0.2), 500) - len(test_data) # 20% of the whole dataset, or only up to 500
-        test_data = test_data + data[:num_test]
-        train_data = train_data + data[num_test:]
+            data += l
+        random.Random(seed).shuffle(data)
+        num_test = min(int(len(data)*0.2), 500) # 20% of the whole dataset, or only up to 500
+        test_data = data[:num_test]
+        train_data = data[num_test:]
 
         test_data = torch.tensor(test_data, dtype=torch.long)
         train_data = torch.tensor(train_data, dtype=torch.long)
