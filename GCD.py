@@ -63,9 +63,9 @@ class GCDDataset(Dataset):
 
         test_data, train_data = [], []
         
-        random.Random(seed).shuffle(data)
+        random.Random(0).shuffle(data)
         for l in prime_data:
-            random.Random(seed).shuffle(l)
+            random.Random(0).shuffle(l)
             part = len(l) // 5
             test_data += l[:part]
             train_data += l[part:]
