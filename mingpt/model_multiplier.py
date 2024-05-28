@@ -167,6 +167,8 @@ class GPT(nn.Module):
                 torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
             elif self.initialization == "xavier":
                 torch.nn.init.xavier_uniform_(module.weight, gain=1.0)
+            elif self.initialization == "constant":
+                torch.nn.init.constant_(module.weight, val=0.05)
             else:
                 raise ValueError(f"unknown initialization: {self.initialization}")
             if module.bias is not None:
@@ -176,6 +178,8 @@ class GPT(nn.Module):
                 torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
             elif self.initialization == "xavier":
                 torch.nn.init.torch.nn.init.xavier_uniform_(module.weight, gain=1.0)
+            elif self.initialization == "constant":
+                torch.nn.init.constant_(module.weight, val=0.05)
             else:
                 raise ValueError(f"unknown initialization: {self.initialization}")
         elif isinstance(module, nn.LayerNorm):
