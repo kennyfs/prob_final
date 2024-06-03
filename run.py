@@ -128,5 +128,5 @@ if __name__ == '__main__':
     print(f"get dataset seed {dataset_seed}")
 
     stop_iteration = run(seed, dataset_seed, task, initialization, sort_by_c_b_a_separate)
-    with open(f"result-sort_by_c_a_b-{task}.csv", "a") as f:
+    with open(f"result-sort_by_c_a_b_separate-{task}.csv", "a") as f:
         f.write(f"{dataset_seed}, {stop_iteration}\n")
