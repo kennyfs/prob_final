@@ -22,14 +22,14 @@ from itertools import permutations
 def add_noise(seed, training_data):
     # training data: a 2D list, shape: [rows, 6]
     rng = random.Random(seed)
-    for i in range(0, len(training_data), 2):
-        # swap the two rows
-        if rng.random() < 0.5:
-            training_data[i], training_data[i+1] = training_data[i+1], training_data[i]
     for i in range(1, len(training_data), 2):
         # swap the two rows
         if rng.random() < 0.5:
-            training_data[i], training_data[i+1] = training_data[i+1], training_data[i]
+            training_data[i], training_data[i-1] = training_data[i-1], training_data[i]
+    for i in range(2, len(training_data), 2):
+        # swap the two rows
+        if rng.random() < 0.5:
+            training_data[i], training_data[i-1] = training_data[i-1], training_data[i]
     return training_data
 def get_config(seed, task, initialization):
     C = CN()
