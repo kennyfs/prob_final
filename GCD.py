@@ -73,7 +73,7 @@ class GCDDataset(Dataset):
         num_test = min(int(len(data)*0.2), 500) - len(test_data) # 20% of the whole dataset, or only up to 500
         test_data = test_data + data[:num_test]
         train_data = train_data + data[num_test:]
-        random.Random(seed).shuffle(train_data)
+        #random.Random(0).shuffle(train_data)
         test_data = torch.tensor(test_data, dtype=torch.long)
         train_data = torch.tensor(train_data, dtype=torch.long)
         
