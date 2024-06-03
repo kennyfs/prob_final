@@ -19,10 +19,30 @@ from mingpt.trainer_multiplier import Trainer
 from mingpt.utils import set_seed, setup_logging, CfgNode as CN
 from itertools import permutations
 # -----------------------------------------------------------------------------
-def average_multi_gcd(seed, training_data):
-    # training data: a 2D list, shape: [rows, 6], 
-    # Sort the training data
-    pass
+def shuffle_within_batch(seed, training_data):
+    # training data: a 2D list, shape: [rows, 6]
+    # shuffle the data within each batch
+    if seed%2 == 0:
+        return training_data
+    else:
+        random.seed(seed)
+        print(training_data[:10])
+        batch = training_data[:32]
+        random.shuffle(batch)
+        training_data[:32] = batch
+        print(training_data[:10])
+        #training_data[35:57] = reversed(training_data[35:57])
+        return torch.tensor(training_data, dtype=torch.long)
+    print(f"initial length: {len(training_data)}")
+    random.seed(seed)
+    for i in range(0, 256, 64):
+        print(f"i={i}")
+        batch = training_data[i:i+64]
+        random.shuffle(batch)
+        training_data[i:i+64] = batch
+    print(f"type: {type(training_data)}, len: {len(training_data)}")
+    return training_data
+#Conclusion: shuffle within batch somehow DOES change the result
 def get_config(seed, task, initialization):
     C = CN()
 
@@ -74,7 +94,7 @@ def batch_end_callback(trainer, model, train_dataset, test_dataset):
 
 # -----------------------------------------------------------------------------
 
-def run(seed, dataseed, task, initialization):
+def run(seed, dataseed, task, initialization, data_rearrange_fn):
     config = get_config(seed, task, initialization)
     setup_logging(config)
 
@@ -84,6 +104,7 @@ def run(seed, dataseed, task, initialization):
     # TODO: try different seed to adjust the data order of train/test-set
     if task == "gcd":
         train_dataset = GCDDataset(config.data, split='train', seed=dataseed)
+        train_dataset.ixes = data_rearrange_fn(dataseed, train_dataset.ixes)
         test_dataset  = GCDDataset(config.data, split='test', seed=dataseed)
     elif task == "ChickenRabbit":
         train_dataset = ChickenRabbitDataset(config.data, split='train', seed=dataseed)
@@ -97,9 +118,6 @@ def run(seed, dataseed, task, initialization):
     trainer.set_callback('on_batch_end', batch_end_callback)
     stop_iteration = trainer.run()
     return stop_iteration
-def run_seeds(seeds, start, end, results):
-    for i in range(start, end):
-        results[i]=run(seeds[i])
 if __name__ == '__main__':
     task = sys.argv[1]
     initialization = sys.argv[2]
@@ -107,8 +125,7 @@ if __name__ == '__main__':
     print(f"get seed {seed}")
     dataset_seed = int(sys.argv[4])
     print(f"get dataset seed {dataset_seed}")
-    random.seed(dataset_seed)
 
-    stop_iteration = run(seed, dataset_seed, task, initialization)
+    stop_iteration = run(seed, dataset_seed, task, initialization, shuffle_within_batch)
     with open(f"result-{task}-{initialization}.csv", "a") as f:
         f.write(f"{dataset_seed}, {stop_iteration}\n")
