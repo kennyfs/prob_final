@@ -36,6 +36,14 @@ def sort_by_c_a_b(seed, training_data):
     training_data.sort(key=lambda x: x[4:6]+x[0:2]+x[2:4])
     training_data = add_noise(seed, training_data)
     return torch.tensor(training_data, dtype=torch.long)
+def sort_by_c_b_a_separate(seed, training_data):
+    training_data=training_data.tolist()
+    training_data.sort(key=lambda x: x[4:6]+x[2:4]+x[0:2])
+    result = []
+    for i in range(5):
+        result.extend(training_data[i::5])
+    result = add_noise(seed, result)
+    return torch.tensor(result, dtype=torch.long)
 def get_config(seed, task, initialization):
     C = CN()
 
@@ -119,6 +127,6 @@ if __name__ == '__main__':
     dataset_seed = int(sys.argv[4])
     print(f"get dataset seed {dataset_seed}")
 
-    stop_iteration = run(seed, dataset_seed, task, initialization, sort_by_c_a_b)
+    stop_iteration = run(seed, dataset_seed, task, initialization, sort_by_c_b_a_separate)
     with open(f"result-sort_by_c_a_b-{task}.csv", "a") as f:
         f.write(f"{dataset_seed}, {stop_iteration}\n")

@@ -81,3 +81,4 @@ if __name__ == "__main__":
         with Pool(args.pools) as pool:
             pool.map(run_command, args_list)
     print(f"total time: {time.time()-st:.2f}s")
+#command: python run_total.py --task gcd --len 100 --initialization constant --initialization_seed 0 --dataset_seed r --pools 4
