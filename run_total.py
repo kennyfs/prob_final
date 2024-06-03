@@ -1,7 +1,6 @@
 from multiprocessing import Pool
 import random
 import subprocess
-import sys
 import argparse
 import time
 
@@ -47,15 +46,15 @@ def get_args():
     parser = argparse.ArgumentParser(
         description="Run tasks with different seeds and initializations."
     )
-    parser.add_argument("task", type=str, help="The task to run.")
-    parser.add_argument("len", type=int, help="The length of the seed list.")
-    parser.add_argument("initialization", type=str, help="The initialization method.")
+    parser.add_argument("--task", type=str, help="The task to run.")
+    parser.add_argument("--len", type=int, help="The length of the seed list.")
+    parser.add_argument("--initialization", type=str, help="The initialization method.")
     parser.add_argument(
-        "initialization_seed", type=str, help="The seed for initialization."
+        "--initialization_seed", type=str, help="The seed for initialization."
     )
-    parser.add_argument("dataset_seed", type=str, help="The seed for the dataset.")
+    parser.add_argument("--dataset_seed", type=str, help="The seed for the dataset.")
     parser.add_argument(
-        "pools", type=int, help="The number of pools for multiprocessing."
+        "--pools", type=int, help="The number of pools for multiprocessing."
     )
     return parser.parse_args()
 
