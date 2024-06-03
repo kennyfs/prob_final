@@ -19,30 +19,18 @@ from mingpt.trainer_multiplier import Trainer
 from mingpt.utils import set_seed, setup_logging, CfgNode as CN
 from itertools import permutations
 # -----------------------------------------------------------------------------
-def shuffle_within_batch(seed, training_data):
+def add_noise(seed, training_data):
     # training data: a 2D list, shape: [rows, 6]
-    # shuffle the data within each batch
-    if seed%2 == 0:
-        return training_data
-    else:
-        random.seed(seed)
-        print(training_data[:10])
-        batch = training_data[:32]
-        random.shuffle(batch)
-        training_data[:32] = batch
-        print(training_data[:10])
-        #training_data[35:57] = reversed(training_data[35:57])
-        return torch.tensor(training_data, dtype=torch.long)
-    print(f"initial length: {len(training_data)}")
-    random.seed(seed)
-    for i in range(0, 256, 64):
-        print(f"i={i}")
-        batch = training_data[i:i+64]
-        random.shuffle(batch)
-        training_data[i:i+64] = batch
-    print(f"type: {type(training_data)}, len: {len(training_data)}")
+    rng = random.Random(seed)
+    for i in range(0, len(training_data), 2):
+        # swap the two rows
+        if rng.random() < 0.5:
+            training_data[i], training_data[i+1] = training_data[i+1], training_data[i]
+    for i in range(1, len(training_data), 2):
+        # swap the two rows
+        if rng.random() < 0.5:
+            training_data[i], training_data[i+1] = training_data[i+1], training_data[i]
     return training_data
-#Conclusion: shuffle within batch somehow DOES change the result
 def get_config(seed, task, initialization):
     C = CN()
 
