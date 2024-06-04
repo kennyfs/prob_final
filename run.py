@@ -120,11 +120,11 @@ def run(seed, dataseed, task, initialization, data_rearrange_fn):
 
     # TODO: try different seed to adjust the data order of train/test-set
     if task == "gcd":
-        train_dataset = GCDDataset(config.data, split='train', seed=dataseed)
+        train_dataset = GCDDataset(config.data, split='train', seed=dataseed) # [row,6]
         train_dataset.ixes = data_rearrange_fn(dataseed, train_dataset.ixes)
         test_dataset  = GCDDataset(config.data, split='test', seed=dataseed)
     elif task == "ChickenRabbit":
-        train_dataset = ChickenRabbitDataset(config.data, split='train', seed=dataseed)
+        train_dataset = ChickenRabbitDataset(config.data, split='train', seed=dataseed) # [row,8]
         test_dataset  = ChickenRabbitDataset(config.data, split='test', seed=dataseed)
 
     # set the correct vocab size: 10, block size: chickenrabbit -> 10, gcd -> 6
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     print(f"get seed {seed}")
     dataset_seed = int(sys.argv[4])
     print(f"get dataset seed {dataset_seed}")
-    rearrange_fn = sort_by_ab_div_cc_separate
+    rearrange_fn = shuffle
     print(f"rearrange function: {rearrange_fn.__name__}")
     stop_iteration = run(seed, dataset_seed, task, initialization, rearrange_fn)
     with open(f"result-{rearrange_fn.__name__}-{task}.csv", "a") as f:
