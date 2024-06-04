@@ -44,6 +44,22 @@ def sort_by_c_b_a_separate(seed, training_data):
         result.extend(training_data[i::5])
     result = add_noise(seed, result)
     return torch.tensor(result, dtype=torch.long)
+def sort_by_ab_div_cc(seed, training_data):
+    training_data=training_data.tolist()
+    training_data.sort(key=lambda x: (10*x[0]+x[1])*(10*x[2]+x[3])/((10*x[4]+x[5])**2))
+    training_data = add_noise(seed, training_data)
+    return torch.tensor(training_data, dtype=torch.long)
+def sort_by_ab_div_cc_separate(seed, training_data):
+    training_data=training_data.tolist()
+    training_data.sort(key=lambda x: (10*x[0]+x[1])*(10*x[2]+x[3])/((10*x[4]+x[5])**2))
+    result = []
+    for i in range(5):
+        result.extend(training_data[i::5])
+    result = add_noise(seed, result)
+    return torch.tensor(result, dtype=torch.long)
+def shuffle(seed, training_data):
+    random.Random(seed).shuffle(training_data)
+    return add_noise(seed, training_data)
 def get_config(seed, task, initialization):
     C = CN()
 
@@ -126,7 +142,8 @@ if __name__ == '__main__':
     print(f"get seed {seed}")
     dataset_seed = int(sys.argv[4])
     print(f"get dataset seed {dataset_seed}")
-
-    stop_iteration = run(seed, dataset_seed, task, initialization, sort_by_c_b_a_separate)
-    with open(f"result-sort_by_c_a_b_separate-{task}.csv", "a") as f:
+    rearrange_fn = sort_by_ab_div_cc
+    print(f"rearrange function: {rearrange_fn.__name__}")
+    stop_iteration = run(seed, dataset_seed, task, initialization, rearrange_fn)
+    with open(f"result-{rearrange_fn.__name__}-{task}.csv", "a") as f:
         f.write(f"{dataset_seed}, {stop_iteration}\n")
