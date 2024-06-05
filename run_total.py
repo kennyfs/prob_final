@@ -1,4 +1,5 @@
 from multiprocessing import Pool
+import os
 import random
 import subprocess
 import argparse
@@ -56,12 +57,14 @@ def get_args():
     parser.add_argument(
         "--pools", type=int, help="The number of pools for multiprocessing."
     )
+    parser.add_argument("--gpu", type=str, help="specify the gpu to use.")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     st = time.time()
     args = get_args()
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
     if args.initialization_seed == "random" or args.initialization_seed == "r":
         seeds = getrandom(args.len)
     else:
@@ -81,4 +84,4 @@ if __name__ == "__main__":
         with Pool(args.pools) as pool:
             pool.map(run_command, args_list)
     print(f"total time: {time.time()-st:.2f}s")
-#command: python run_total.py --task gcd --len 100 --initialization constant --initialization_seed 0 --dataset_seed r --pools 4
+# command: python run_total.py --task gcd --len 100 --initialization constant --initialization_seed 0 --dataset_seed r --pools 4
