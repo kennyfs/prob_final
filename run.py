@@ -148,7 +148,7 @@ def number_of_prime_factors(seed, training_data):
             if num % p == 0:
                 num_factor[num] = num_factor[num//p] + 1
                 break
-    len = max(num_factor)
+    len = max(num_factor)*2
     data=[[] for _ in range(len+1)]
     random.seed(seed)
     for f in range(len+1):
@@ -284,7 +284,7 @@ if __name__ == "__main__":
     print(f"get seed {seed}")
     dataset_seed = int(sys.argv[4])
     print(f"get dataset seed {dataset_seed}")
-    rearrange_fn = number_of_diff_prime_factors
+    rearrange_fn = number_of_prime_factors
     print(f"rearrange function: {rearrange_fn.__name__}")
     stop_iteration = run(seed, dataset_seed, task, initialization, rearrange_fn)
     with open(f"result-{rearrange_fn.__name__}-{task}.csv", "a") as f:
