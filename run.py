@@ -131,6 +131,62 @@ def all_even_first_with_shuffle(seed, training_data):
     result = add_noise(seed, result)
     return torch.tensor(result, dtype=torch.long)
 
+def number_of_prime_factors(seed, training_data):
+    training_data = training_data.tolist()
+    prime = []
+    for num in range(2, 200):
+        is_prime = True
+        for i in range(2, int(num ** 0.5) + 1):
+            if num % i == 0:
+                is_prime = False
+                break
+        if is_prime:
+            prime.append(num)
+    num_factor = [0]*201
+    for num in range(2, 201):
+        for p in prime:
+            if num % p == 0:
+                num_factor[num] = num_factor[num//p] + 1
+                break
+    len = max(num_factor)
+    data=[[] for _ in range(len+1)]
+    random.seed(seed)
+    for f in range(len+1):
+        data[f] = [d for d in training_data if num_factor[10*d[0]+d[1]]+num_factor[10*d[2]+d[3]] == f]
+        random.shuffle(data[f])
+    result = []
+    for i in range(len+1):
+        result.extend(data[i])
+    result = add_noise(seed, result)
+    return torch.tensor(result, dtype=torch.long)
+def number_of_diff_prime_factors(seed, training_data):
+    training_data = training_data.tolist()
+    prime = []
+    for num in range(2, 200):
+        is_prime = True
+        for i in range(2, int(num ** 0.5) + 1):
+            if num % i == 0:
+                is_prime = False
+                break
+        if is_prime:
+            prime.append(num)
+    prime_factor = [set() for _ in range(201)]
+    for num in range(2, 201):
+        for p in prime:
+            if num % p == 0:
+                prime_factor[num] = prime_factor[num//p].union({p})
+                break
+    num_factor = [len(p) for p in prime_factor]
+    data=[[] for _ in range(7)]
+    random.seed(seed)
+    for f in range(7):
+        data[f] = [d for d in training_data if num_factor[10*d[0]+d[1]]+num_factor[10*d[2]+d[3]] == f]
+        random.shuffle(data[f])
+    result = []
+    for i in range(7):
+        result.extend(data[i])
+    result = add_noise(seed, result)
+    return torch.tensor(result, dtype=torch.long)
 
 def shuffle(seed, training_data):
     random.Random(seed).shuffle(training_data)
@@ -228,7 +284,7 @@ if __name__ == "__main__":
     print(f"get seed {seed}")
     dataset_seed = int(sys.argv[4])
     print(f"get dataset seed {dataset_seed}")
-    rearrange_fn = all_even_first_with_shuffle
+    rearrange_fn = number_of_diff_prime_factors
     print(f"rearrange function: {rearrange_fn.__name__}")
     stop_iteration = run(seed, dataset_seed, task, initialization, rearrange_fn)
     with open(f"result-{rearrange_fn.__name__}-{task}.csv", "a") as f:
