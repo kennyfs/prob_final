@@ -131,6 +131,17 @@ def all_even_first_with_shuffle(seed, training_data):
     result = add_noise(seed, result)
     return torch.tensor(result, dtype=torch.long)
 
+def all_even_first_with_shuffle_without_interleaving(seed, training_data):
+    training_data = training_data.tolist()
+    group1 = [data for data in training_data if (data[1] % 2 == 0 or data[3] % 2 == 0)]
+    group2 = [data for data in training_data if (data[1] % 2 == 1 and data[3] % 2 == 1)]
+    random.seed(seed)
+    random.shuffle(group1)
+    random.shuffle(group2)
+    result = group1 + group2
+    result = add_noise(seed, result)
+    return torch.tensor(result, dtype=torch.long)
+
 def number_of_prime_factors(seed, training_data):
     training_data = training_data.tolist()
     prime = []
@@ -284,7 +295,7 @@ if __name__ == "__main__":
     print(f"get seed {seed}")
     dataset_seed = int(sys.argv[4])
     print(f"get dataset seed {dataset_seed}")
-    rearrange_fn = number_of_prime_factors
+    rearrange_fn = all_even_first_with_shuffle_without_interleaving
     print(f"rearrange function: {rearrange_fn.__name__}")
     stop_iteration = run(seed, dataset_seed, task, initialization, rearrange_fn)
     with open(f"result-{rearrange_fn.__name__}-{task}.csv", "a") as f:
