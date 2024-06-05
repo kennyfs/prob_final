@@ -42,7 +42,7 @@ class ChickenRabbitDataset(Dataset):
         data = self.chicken_rabbit()
         print(f'the length of the whole data = {len(data)}')
 
-        random.Random(seed).shuffle(data)
+        random.Random(0).shuffle(data)
         perm = torch.tensor(data, dtype=torch.long)
 
         num_test = min(int(len(perm)*0.2), 500) # 20% of the whole dataset, or only up to 500
