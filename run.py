@@ -279,6 +279,22 @@ def group18(seed, training_data):
     return torch.tensor(training_data, dtype=torch.long)
 
 
+def group7_1(seed, training_data):
+    training_data = training_data.tolist()
+    training_data.sort()
+    arr0 = []
+    arr1 = []
+    for i, data in enumerate(training_data):
+        if i % 2 == 0:
+            arr0.append(data)
+        else:
+            arr1.append(data)
+    arr1 = reversed(arr1)
+    training_data = arr0 + arr1
+    training_data = add_noise(seed, training_data)
+    return torch.tensor(training_data, dtype=torch.long)
+
+
 def shuffle(seed, training_data):
     random.Random(seed).shuffle(training_data)
     return add_noise(seed, training_data)
@@ -378,7 +394,7 @@ if __name__ == "__main__":
     print(f"get seed {seed}")
     dataset_seed = int(sys.argv[4])
     print(f"get dataset seed {dataset_seed}")
-    rearrange_fn = group18
+    rearrange_fn = group7_1
     print(f"rearrange function: {rearrange_fn.__name__}")
     stop_iteration = run(seed, dataset_seed, task, initialization, rearrange_fn)
     with open(f"result-{rearrange_fn.__name__}-{task}.csv", "a") as f:
