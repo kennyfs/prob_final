@@ -289,7 +289,7 @@ def group7_1(seed, training_data):
             arr0.append(data)
         else:
             arr1.append(data)
-    arr1 = reversed(arr1)
+    arr1 = list(reversed(arr1))
     training_data = arr0 + arr1
     training_data = add_noise(seed, training_data)
     return torch.tensor(training_data, dtype=torch.long)
