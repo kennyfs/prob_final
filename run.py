@@ -131,6 +131,7 @@ def all_even_first_with_shuffle(seed, training_data):
     result = add_noise(seed, result)
     return torch.tensor(result, dtype=torch.long)
 
+
 def all_even_first_with_shuffle_without_interleaving(seed, training_data):
     training_data = training_data.tolist()
     group1 = [data for data in training_data if (data[1] % 2 == 0 or data[3] % 2 == 0)]
@@ -142,40 +143,47 @@ def all_even_first_with_shuffle_without_interleaving(seed, training_data):
     result = add_noise(seed, result)
     return torch.tensor(result, dtype=torch.long)
 
+
 def number_of_prime_factors(seed, training_data):
     training_data = training_data.tolist()
     prime = []
     for num in range(2, 200):
         is_prime = True
-        for i in range(2, int(num ** 0.5) + 1):
+        for i in range(2, int(num**0.5) + 1):
             if num % i == 0:
                 is_prime = False
                 break
         if is_prime:
             prime.append(num)
-    num_factor = [0]*201
+    num_factor = [0] * 201
     for num in range(2, 201):
         for p in prime:
             if num % p == 0:
-                num_factor[num] = num_factor[num//p] + 1
+                num_factor[num] = num_factor[num // p] + 1
                 break
-    len = max(num_factor)*2
-    data=[[] for _ in range(len+1)]
+    len = max(num_factor) * 2
+    data = [[] for _ in range(len + 1)]
     random.seed(seed)
-    for f in range(len+1):
-        data[f] = [d for d in training_data if num_factor[10*d[0]+d[1]]+num_factor[10*d[2]+d[3]] == f]
+    for f in range(len + 1):
+        data[f] = [
+            d
+            for d in training_data
+            if num_factor[10 * d[0] + d[1]] + num_factor[10 * d[2] + d[3]] == f
+        ]
         random.shuffle(data[f])
     result = []
-    for i in range(len+1):
+    for i in range(len + 1):
         result.extend(data[i])
     result = add_noise(seed, result)
     return torch.tensor(result, dtype=torch.long)
+
+
 def number_of_diff_prime_factors(seed, training_data):
     training_data = training_data.tolist()
     prime = []
     for num in range(2, 200):
         is_prime = True
-        for i in range(2, int(num ** 0.5) + 1):
+        for i in range(2, int(num**0.5) + 1):
             if num % i == 0:
                 is_prime = False
                 break
@@ -185,13 +193,17 @@ def number_of_diff_prime_factors(seed, training_data):
     for num in range(2, 201):
         for p in prime:
             if num % p == 0:
-                prime_factor[num] = prime_factor[num//p].union({p})
+                prime_factor[num] = prime_factor[num // p].union({p})
                 break
     num_factor = [len(p) for p in prime_factor]
-    data=[[] for _ in range(7)]
+    data = [[] for _ in range(7)]
     random.seed(seed)
     for f in range(7):
-        data[f] = [d for d in training_data if num_factor[10*d[0]+d[1]]+num_factor[10*d[2]+d[3]] == f]
+        data[f] = [
+            d
+            for d in training_data
+            if num_factor[10 * d[0] + d[1]] + num_factor[10 * d[2] + d[3]] == f
+        ]
         random.shuffle(data[f])
     result = []
     for i in range(7):
@@ -199,12 +211,16 @@ def number_of_diff_prime_factors(seed, training_data):
     result = add_noise(seed, result)
     return torch.tensor(result, dtype=torch.long)
 
+
 def shuffle(seed, training_data):
     random.Random(seed).shuffle(training_data)
     return add_noise(seed, training_data)
+
+
 def shuffle0(seed, training_data):
     random.Random(0).shuffle(training_data)
     return add_noise(seed, training_data)
+
 
 def get_config(seed, task, initialization):
     C = CN()
