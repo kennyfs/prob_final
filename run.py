@@ -237,7 +237,7 @@ def c234first_shuffle(seed, training_data):
     batches = total_len // batch_size
     rng = random.Random(seed)
     for i in range(batches // 4):
-        tmp=[]
+        tmp = []
         tmp.extend(c234_data[: batch_size // 2])
         c234_data = c234_data[batch_size // 2 :]
         tmp.extend(other_data[: batch_size // 2])
@@ -247,6 +247,34 @@ def c234first_shuffle(seed, training_data):
     remaining = c234_data + other_data
     random.Random(seed).shuffle(remaining)
     training_data.extend(remaining)
+    training_data = add_noise(seed, training_data)
+    return torch.tensor(training_data, dtype=torch.long)
+
+
+def group18(seed, training_data):
+    training_data = training_data.tolist()
+    ac = []
+    prime = []
+    for num in range(2, 200):
+        is_prime = True
+        for i in range(2, int(num**0.5) + 1):
+            if num % i == 0:
+                is_prime = False
+                break
+        if is_prime:
+            prime.append(num)
+    for data in training_data:
+        if data[0] * 10 + data[1] == data[4] * 10 + data[5] and prime.count(
+            data[4] * 10 + data[5]
+        ):
+            ac.append(data)
+    other = [data for data in training_data if data not in ac]
+    ac = sorted(ac, key=lambda x: x[4] * 10 + x[5])
+    dup = []
+    for data in ac:
+        if data[0] * 10 + data[1] == 2:
+            dup.append(data)
+    training_data = ac + dup + other
     training_data = add_noise(seed, training_data)
     return torch.tensor(training_data, dtype=torch.long)
 
@@ -350,7 +378,7 @@ if __name__ == "__main__":
     print(f"get seed {seed}")
     dataset_seed = int(sys.argv[4])
     print(f"get dataset seed {dataset_seed}")
-    rearrange_fn = c234first_shuffle
+    rearrange_fn = group18
     print(f"rearrange function: {rearrange_fn.__name__}")
     stop_iteration = run(seed, dataset_seed, task, initialization, rearrange_fn)
     with open(f"result-{rearrange_fn.__name__}-{task}.csv", "a") as f:
