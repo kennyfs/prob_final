@@ -202,7 +202,9 @@ def number_of_diff_prime_factors(seed, training_data):
 def shuffle(seed, training_data):
     random.Random(seed).shuffle(training_data)
     return add_noise(seed, training_data)
-
+def shuffle0(seed, training_data):
+    random.Random(0).shuffle(training_data)
+    return add_noise(seed, training_data)
 
 def get_config(seed, task, initialization):
     C = CN()
@@ -295,7 +297,7 @@ if __name__ == "__main__":
     print(f"get seed {seed}")
     dataset_seed = int(sys.argv[4])
     print(f"get dataset seed {dataset_seed}")
-    rearrange_fn = all_even_first_with_shuffle_without_interleaving
+    rearrange_fn = shuffle0
     print(f"rearrange function: {rearrange_fn.__name__}")
     stop_iteration = run(seed, dataset_seed, task, initialization, rearrange_fn)
     with open(f"result-{rearrange_fn.__name__}-{task}.csv", "a") as f:
