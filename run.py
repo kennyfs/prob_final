@@ -212,7 +212,7 @@ def number_of_diff_prime_factors(seed, training_data):
     return torch.tensor(result, dtype=torch.long)
 
 
-def c234first(seed, training_data):
+def c234first_shuffle(seed, training_data):
     training_data = training_data.tolist()
     # cnt = [0]*201
     # for data in training_data:
@@ -235,11 +235,15 @@ def c234first(seed, training_data):
     training_data = []
     batch_size = 64  # should be even
     batches = total_len // batch_size
+    rng = random.Random(seed)
     for i in range(batches // 4):
-        training_data.extend(c234_data[: batch_size // 2])
+        tmp=[]
+        tmp.extend(c234_data[: batch_size // 2])
         c234_data = c234_data[batch_size // 2 :]
-        training_data.extend(other_data[: batch_size // 2])
+        tmp.extend(other_data[: batch_size // 2])
         other_data = other_data[batch_size // 2 :]
+        rng.shuffle(tmp)
+        training_data.extend(tmp)
     remaining = c234_data + other_data
     random.Random(seed).shuffle(remaining)
     training_data.extend(remaining)
@@ -346,7 +350,7 @@ if __name__ == "__main__":
     print(f"get seed {seed}")
     dataset_seed = int(sys.argv[4])
     print(f"get dataset seed {dataset_seed}")
-    rearrange_fn = c234first
+    rearrange_fn = c234first_shuffle
     print(f"rearrange function: {rearrange_fn.__name__}")
     stop_iteration = run(seed, dataset_seed, task, initialization, rearrange_fn)
     with open(f"result-{rearrange_fn.__name__}-{task}.csv", "a") as f:
