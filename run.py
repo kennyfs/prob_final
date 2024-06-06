@@ -212,13 +212,46 @@ def number_of_diff_prime_factors(seed, training_data):
     return torch.tensor(result, dtype=torch.long)
 
 
+def c234first(seed, training_data):
+    training_data = training_data.tolist()
+    # cnt = [0]*201
+    # for data in training_data:
+    #     cnt[data[4]*10+data[5]] += 1
+    # for i,c in enumerate(cnt):
+    #     print(i,c)
+    # return
+    total_len = len(training_data)
+    random.Random(seed).shuffle(training_data)
+    c234_data = []
+    other_data = []
+    for data in training_data:
+        if (data[5] * 10 + data[6]) in (2, 3, 4):
+            c234_data.append(data)
+        else:
+            other_data.append(data)
+    c234_len = len(c234_data)
+    other_len = len(other_data)
+    # about 1/2 of c234_data goes to first 1/4
+    training_data = []
+    batch_size = 64  # should be even
+    batches = total_len // batch_size
+    for i in range(batches // 4):
+        training_data.extend(c234_data[: batch_size // 2])
+        c234_data = c234_data[batch_size // 2 :]
+        training_data.extend(other_data[: batch_size // 2])
+        other_data = other_data[batch_size // 2 :]
+    remaining = c234_data + other_data
+    random.Random(seed).shuffle(remaining)
+    training_data.extend(remaining)
+    training_data = add_noise(seed, training_data)
+    return torch.tensor(training_data, dtype=torch.long)
+
+
 def shuffle(seed, training_data):
     random.Random(seed).shuffle(training_data)
     return add_noise(seed, training_data)
 
-
-def shuffle0(seed, training_data):
-    random.Random(0).shuffle(training_data)
+    random.Random(1).shuffle(training_data)
     return add_noise(seed, training_data)
 
 
@@ -313,7 +346,7 @@ if __name__ == "__main__":
     print(f"get seed {seed}")
     dataset_seed = int(sys.argv[4])
     print(f"get dataset seed {dataset_seed}")
-    rearrange_fn = shuffle0
+    rearrange_fn = c234first
     print(f"rearrange function: {rearrange_fn.__name__}")
     stop_iteration = run(seed, dataset_seed, task, initialization, rearrange_fn)
     with open(f"result-{rearrange_fn.__name__}-{task}.csv", "a") as f:
