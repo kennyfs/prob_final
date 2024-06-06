@@ -31,35 +31,16 @@ def add_noise(seed, training_data):
         if rng.random() < 0.5:
             training_data[i], training_data[i-1] = training_data[i-1], training_data[i]
     return training_data
-def sort_by_c_a_b(seed, training_data):
-    training_data=training_data.tolist()
-    training_data.sort(key=lambda x: x[4:6]+x[0:2]+x[2:4])
-    training_data = add_noise(seed, training_data)
-    return torch.tensor(training_data, dtype=torch.long)
-def sort_by_c_b_a_separate(seed, training_data):
-    training_data=training_data.tolist()
-    training_data.sort(key=lambda x: x[4:6]+x[2:4]+x[0:2])
-    result = []
-    for i in range(5):
-        result.extend(training_data[i::5])
-    result = add_noise(seed, result)
-    return torch.tensor(result, dtype=torch.long)
-def sort_by_ab_div_cc(seed, training_data):
-    training_data=training_data.tolist()
-    training_data.sort(key=lambda x: (10*x[0]+x[1])*(10*x[2]+x[3])/((10*x[4]+x[5])**2))
-    training_data = add_noise(seed, training_data)
-    return torch.tensor(training_data, dtype=torch.long)
-def sort_by_ab_div_cc_separate(seed, training_data):
-    training_data=training_data.tolist()
-    training_data.sort(key=lambda x: (10*x[0]+x[1])*(10*x[2]+x[3])/((10*x[4]+x[5])**2))
-    result = []
-    for i in range(5):
-        result.extend(training_data[i::5])
-    result = add_noise(seed, result)
-    return torch.tensor(result, dtype=torch.long)
+
 def shuffle(seed, training_data):
     random.Random(seed).shuffle(training_data)
     return add_noise(seed, training_data)
+def chickrab_ab_with_batch_fifty(seed, training_data):
+    training_data = training_data.tolist()
+    for i in range(0, len(training_data), 50):
+            training_data[i:i+50] = sorted(training_data[i:i+50], key=lambda x: (x[0]*100+x[1]*10+x[2])*(x[3]*100+x[4]*10+x[5]))
+    training_data = add_noise(seed, training_data)
+    return torch.tensor(training_data, dtype=torch.long)
 def get_config(seed, task, initialization):
     C = CN()
 
@@ -125,6 +106,7 @@ def run(seed, dataseed, task, initialization, data_rearrange_fn):
         test_dataset  = GCDDataset(config.data, split='test', seed=dataseed)
     elif task == "ChickenRabbit":
         train_dataset = ChickenRabbitDataset(config.data, split='train', seed=dataseed) # [row,8]
+        train_dataset.ixes = data_rearrange_fn(dataseed, train_dataset.ixes)
         test_dataset  = ChickenRabbitDataset(config.data, split='test', seed=dataseed)
 
     # set the correct vocab size: 10, block size: chickenrabbit -> 10, gcd -> 6
@@ -142,7 +124,7 @@ if __name__ == '__main__':
     print(f"get seed {seed}")
     dataset_seed = int(sys.argv[4])
     print(f"get dataset seed {dataset_seed}")
-    rearrange_fn = shuffle
+    rearrange_fn = chickrab_ab_with_batch_fifty
     print(f"rearrange function: {rearrange_fn.__name__}")
     stop_iteration = run(seed, dataset_seed, task, initialization, rearrange_fn)
     with open(f"result-{rearrange_fn.__name__}-{task}.csv", "a") as f:
