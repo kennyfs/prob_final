@@ -225,7 +225,7 @@ def c234first(seed, training_data):
     c234_data = []
     other_data = []
     for data in training_data:
-        if (data[5] * 10 + data[6]) in (2, 3, 4):
+        if (data[4] * 10 + data[5]) in (2, 3, 4):
             c234_data.append(data)
         else:
             other_data.append(data)
