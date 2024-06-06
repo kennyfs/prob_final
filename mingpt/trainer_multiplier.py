@@ -21,7 +21,7 @@ class Trainer:
         # dataloder parameters
         C.num_workers = 4
         # optimizer parameters
-        C.max_iters = 25000
+        C.max_iters = 7351
         C.batch_size = 64
         C.learning_rate = 5e-4
         C.betas = (0.9, 0.95)
