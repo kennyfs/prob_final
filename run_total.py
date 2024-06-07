@@ -67,10 +67,18 @@ if __name__ == "__main__":
     os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
     if args.initialization_seed == "random" or args.initialization_seed == "r":
         seeds = getrandom(args.len)
+    elif type(eval(args.initialization_seed)) == list:
+        l=eval(args.initialization_seed)
+        assert len(l) == args.len
+        seeds = l
     else:
         seeds = [int(args.initialization_seed) for _ in range(args.len)]
     if args.dataset_seed == "random" or args.dataset_seed == "r":
         dataset_seeds = getrandom(args.len)
+    elif type(eval(args.dataset_seed)) == list:
+        l=eval(args.dataset_seed)
+        assert len(l) == args.len
+        dataset_seeds = l
     else:
         dataset_seeds = [int(args.dataset_seed) for _ in range(args.len)]
     args_list = [
@@ -84,4 +92,5 @@ if __name__ == "__main__":
         with Pool(args.pools) as pool:
             pool.map(run_command, args_list)
     print(f"total time: {time.time()-st:.2f}s")
-#command: python run_total.py --task gcd --len 100 --initialization constant --initialization_seed 0 --dataset_seed r --pools 4
+# 2-1 command: python run_total.py --task ChickenRabbit --len 100 --initialization constant --initialization_seed 0 --dataset_seed r --pools 4 --gpu 0
+# 2-2 command: python run_total.py --task ChickenRabbit --len 10 --initialization xavier --initialization_seed [0,1,2,3,4,5,6,7,8,9] --dataset_seed 0 --pools 4 --gpu 0

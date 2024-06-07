@@ -33,8 +33,10 @@ def add_noise(seed, training_data):
     return training_data
 
 def shuffle(seed, training_data):
+    training_data = training_data.tolist()
     random.Random(seed).shuffle(training_data)
-    return add_noise(seed, training_data)
+    return torch.tensor(training_data, dtype=torch.long)
+
 def chickrab_ab_with_batch_fifty(seed, training_data):
     training_data = training_data.tolist()
     for i in range(0, len(training_data), 50):
@@ -128,4 +130,4 @@ if __name__ == '__main__':
     print(f"rearrange function: {rearrange_fn.__name__}")
     stop_iteration = run(seed, dataset_seed, task, initialization, rearrange_fn)
     with open(f"result-{rearrange_fn.__name__}-{task}.csv", "a") as f:
-        f.write(f"{dataset_seed}, {stop_iteration}\n")
+        f.write(f"{seed}, {dataset_seed}, {stop_iteration}\n")
